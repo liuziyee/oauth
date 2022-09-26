@@ -1,12 +1,12 @@
 package com.dorohedoro.controller;
 
-import com.dorohedoro.dto.UserDTO;
+import com.dorohedoro.domain.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
-public class UserResourceController {
+public class UserController {
 
     @GetMapping("/greeting")
     public String greeting() {
@@ -15,8 +15,8 @@ public class UserResourceController {
 
     @PostMapping("/greeting")
     @ResponseStatus(HttpStatus.CREATED)
-    public String greeting(@RequestParam String no, @RequestBody UserDTO userDTO) {
-        return "Hello " + no + "\n" + userDTO.getId();
+    public String greeting(@RequestParam String no, @RequestBody User user) {
+        return "Hello " + no + "\n" + user.getId();
     }
 
     @PutMapping("/greeting/{no}")

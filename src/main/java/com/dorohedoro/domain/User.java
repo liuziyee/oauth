@@ -1,4 +1,4 @@
-package com.dorohedoro.dto;
+package com.dorohedoro.domain;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class UserDTO implements Serializable {
+public class User implements Serializable {
 
     private Long id;
 
@@ -14,11 +14,9 @@ public class UserDTO implements Serializable {
 
     private String password;
 
-    private String extraInfo;
+    private String email;
 
     private Date createTime;
 
     private Date updateTime;
-
-    private Integer deleted;
 }

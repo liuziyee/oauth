@@ -2,7 +2,7 @@ package com.dorohedoro.config;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dorohedoro.filter.FormAuthenticationFilter;
+import com.dorohedoro.filter.PayloadAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
@@ -11,20 +11,29 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.Map;
 
 @EnableWebSecurity(debug = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        String defaultEncoderId = "bcrypt";
+        Map<String, PasswordEncoder> encoderMap = Map.of(
+                defaultEncoderId, new BCryptPasswordEncoder(),
+                "SHA-1", new MessageDigestPasswordEncoder("SHA-1")
+        );
+        return new DelegatingPasswordEncoder(defaultEncoderId, encoderMap);
     }
     
     @Bean
-    public UsernamePasswordAuthenticationFilter formAuthenticationFilter() throws Exception {
-        FormAuthenticationFilter filter = new FormAuthenticationFilter();
+    public UsernamePasswordAuthenticationFilter payloadAuthenticationFilter() throws Exception {
+        PayloadAuthenticationFilter filter = new PayloadAuthenticationFilter();
         filter.setAuthenticationSuccessHandler((req, res, auth) -> {
             res.setStatus(HttpStatus.OK.value());
             res.getWriter().write(JSON.toJSONString(auth));
@@ -47,7 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/api/**").hasRole("USER")
                 .anyRequest().authenticated())
-                .addFilterAt(formAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(payloadAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults())
                 .csrf(configurer -> configurer.disable());
     }
