@@ -1,7 +1,8 @@
 package com.dorohedoro.controller;
 
 import com.dorohedoro.domain.User;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,7 +15,6 @@ public class UserController {
     }
 
     @PostMapping("/greeting")
-    @ResponseStatus(HttpStatus.CREATED)
     public String greeting(@RequestParam String no, @RequestBody User user) {
         return "Hello " + no + "\n" + user.getId();
     }
@@ -22,5 +22,10 @@ public class UserController {
     @PutMapping("/greeting/{no}")
     public String greeting(@PathVariable String no) {
         return "Hello " + no;
+    }
+    
+    @GetMapping("/principal")
+    public Authentication principal() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 }

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -21,12 +22,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
+import javax.sql.DataSource;
 import java.util.Map;
 
 @EnableWebSecurity(debug = true)
 @Import(SecurityProblemSupport.class)
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final DataSource dataSource;
 
     private final SecurityProblemSupport securityProblemSupport;
 
@@ -68,29 +72,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .authenticationEntryPoint(securityProblemSupport)
                         .accessDeniedHandler(securityProblemSupport))
                 .authorizeRequests(registry -> registry
-                        .antMatchers("/authorize/**").permitAll() // 放行
+                        .antMatchers("/authorize/**").permitAll()
                         .antMatchers("/admin/**").hasRole("ADMIN")
                         .antMatchers("/api/**").hasRole("USER")
                         .anyRequest().authenticated())
                 .addFilterAt(payloadAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable);
+                .httpBasic(Customizer.withDefaults());
     }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web
-                .ignoring()
-                .antMatchers("/error/**");
-    }
-
+    
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .inMemoryAuthentication()
-                .withUser("root")
-                .password(passwordEncoder().encode("dorohedoro1994"))
-                .roles("USER", "ADMIN");
+                .jdbcAuthentication()
+                .dataSource(dataSource)
+                .usersByUsernameQuery("select username, password_hash, enabled from users where username = ?")
+                .authoritiesByUsernameQuery("select users.username, roles.role_name from users " +
+                        "join users_roles on users.id = users_roles.user_id " +
+                        "join roles on roles.id = users_roles.role_id " +
+                        "where username = ?");
     }
+
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers("/error/**"); // 绕开过滤器链
+    }
+
 }
