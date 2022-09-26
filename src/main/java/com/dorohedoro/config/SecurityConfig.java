@@ -3,23 +3,32 @@ package com.dorohedoro.config;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dorohedoro.filter.PayloadAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
 import java.util.Map;
 
 @EnableWebSecurity(debug = true)
+@Import(SecurityProblemSupport.class)
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final SecurityProblemSupport securityProblemSupport;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -30,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         );
         return new DelegatingPasswordEncoder(defaultEncoderId, encoderMap);
     }
-    
+
     @Bean
     public UsernamePasswordAuthenticationFilter payloadAuthenticationFilter() throws Exception {
         PayloadAuthenticationFilter filter = new PayloadAuthenticationFilter();
@@ -49,21 +58,37 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         filter.setFilterProcessesUrl("/authorize/login");
         return filter;
     }
-    
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests(registry -> registry.antMatchers("/authorize/**").permitAll() // 放行
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/api/**").hasRole("USER")
-                .anyRequest().authenticated())
+        http
+                .requestMatchers(configurer -> configurer.mvcMatchers("/api/**", "/admin/**", "/authorize/**"))
+                .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(configurer -> configurer
+                        .authenticationEntryPoint(securityProblemSupport)
+                        .accessDeniedHandler(securityProblemSupport))
+                .authorizeRequests(registry -> registry
+                        .antMatchers("/authorize/**").permitAll() // 放行
+                        .antMatchers("/admin/**").hasRole("ADMIN")
+                        .antMatchers("/api/**").hasRole("USER")
+                        .anyRequest().authenticated())
                 .addFilterAt(payloadAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(Customizer.withDefaults())
-                .csrf(configurer -> configurer.disable());
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable);
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web
+                .ignoring()
+                .antMatchers("/error/**");
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
+        auth
+                .inMemoryAuthentication()
                 .withUser("root")
                 .password(passwordEncoder().encode("dorohedoro1994"))
                 .roles("USER", "ADMIN");
