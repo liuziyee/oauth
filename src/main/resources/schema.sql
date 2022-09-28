@@ -1,26 +1,29 @@
+DROP TABLE IF EXISTS roles;
 CREATE TABLE IF NOT EXISTS roles (
-    id BIGINT NOT NULL AUTO_INCREMENT,
+    id BIGINT(20) NOT NULL AUTO_INCREMENT,
     role_name VARCHAR(50) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT uk_roles_role_name UNIQUE (role_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS users;
 CREATE TABLE IF NOT EXISTS users (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    account_non_expired BIT NOT NULL,
-    account_non_locked BIT NOT NULL,
-    credentials_non_expired BIT NOT NULL,
-    email VARCHAR(254) NOT NULL,
-    enabled BIT NOT NULL,
-    mobile VARCHAR(11) NOT NULL,
-    password_hash VARCHAR(80) NOT NULL,
+    id BIGINT(20) NOT NULL AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL,
+    password_hash VARCHAR(80) NOT NULL,
+    mobile VARCHAR(11) NOT NULL,
+    enabled TINYINT NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    account_non_expired TINYINT NOT NULL,
+    account_non_locked TINYINT NOT NULL,
+    credentials_non_expired TINYINT NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT uk_users_username UNIQUE (username),
     CONSTRAINT uk_users_mobile UNIQUE (mobile),
     CONSTRAINT uk_users_email UNIQUE (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS users_roles;
 CREATE TABLE IF NOT EXISTS users_roles (
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,

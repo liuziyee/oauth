@@ -88,10 +88,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .jdbcAuthentication()
                 .dataSource(dataSource)
                 .usersByUsernameQuery("select username, password_hash, enabled from users where username = ?")
-                .authoritiesByUsernameQuery("select users.username, roles.role_name from users " +
-                        "join users_roles on users.id = users_roles.user_id " +
-                        "join roles on roles.id = users_roles.role_id " +
-                        "where username = ?");
+                .authoritiesByUsernameQuery("select users.username, roles.role_name from users_roles " +
+                        "join users on users_roles.user_id = users.id " +
+                        "join roles on users_roles.role_id = roles.id " +
+                        "where username = ?")
+                .passwordEncoder(passwordEncoder());
     }
 
     @Override
