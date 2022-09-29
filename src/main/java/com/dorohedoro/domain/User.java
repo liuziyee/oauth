@@ -1,5 +1,6 @@
 package com.dorohedoro.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -18,10 +19,13 @@ public class User implements UserDetails, Serializable {
 
     private String username;
 
+    @JSONField(serialize = false)
     @TableField("password_hash")
     private String password;
 
     private String email;
+
+    private String mobile;
     
     private boolean enabled;
 

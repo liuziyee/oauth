@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS users_roles (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO users(id, username, mobile, password_hash, enabled, account_non_expired, account_non_locked, credentials_non_expired, email)
-            VALUES (1, 'root', '00000000000', '{bcrypt}$2a$10$V7Pd6zlCA8EDefp3nTOvwO3IT7UgZ9UGjJ0Lb/ttUXb4SS948qroe', 1, 1, 1, 1, 'dorohedoro@163.com');
+            VALUES (1, 'root', '00000000000', '{bcrypt}$2a$10$V7Pd6zlCA8EDefp3nTOvwO3IT7UgZ9UGjJ0Lb/ttUXb4SS948qroe', 1, 1, 1, 1, 'dorohedoro@163.com'),
+                   (2, 'jiaozi', '11111111111', '{SHA-1}7ce0359f12857f2a90c7de465f40a95f01cb5da9', 1, 1, 1, 1, 'jiaozi@163.com');
 INSERT INTO roles(id, role_name) VALUES (1, 'ROLE_USER'), (2, 'ROLE_ADMIN');
-INSERT INTO users_roles(user_id, role_id) VALUES (1, 1), (1, 2);
+INSERT INTO users_roles(user_id, role_id) VALUES (1, 1), (1, 2), (2, 1);

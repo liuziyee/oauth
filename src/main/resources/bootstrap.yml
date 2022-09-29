@@ -23,7 +23,7 @@ mybatis-plus:
     db-config:
       id-type: auto
     banner: false
-  type-aliases-package: com.dorohedoro.entity
+  type-aliases-package: com.dorohedoro.domain
 
 logging:
   level: 

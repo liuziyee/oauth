@@ -15,6 +15,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsPasswordService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
@@ -22,15 +24,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
-import javax.sql.DataSource;
 import java.util.Map;
 
 @EnableWebSecurity(debug = true)
 @Import(SecurityProblemSupport.class)
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private final DataSource dataSource;
+    
+    private final UserDetailsService userDetailsService;
+    
+    private final UserDetailsPasswordService userDetailsPasswordService;
 
     private final SecurityProblemSupport securityProblemSupport;
 
@@ -85,13 +88,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .jdbcAuthentication()
-                .dataSource(dataSource)
-                .usersByUsernameQuery("select username, password_hash, enabled from users where username = ?")
-                .authoritiesByUsernameQuery("select users.username, roles.role_name from users_roles " +
-                        "join users on users_roles.user_id = users.id " +
-                        "join roles on users_roles.role_id = roles.id " +
-                        "where username = ?")
+                .userDetailsService(userDetailsService)
+                .userDetailsPasswordManager(userDetailsPasswordService)
                 .passwordEncoder(passwordEncoder());
     }
 
