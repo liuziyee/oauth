@@ -37,3 +37,11 @@ logging:
     org:
       springframework:
         security: DEBUG
+
+app:
+  jwt:
+    header: Authorization
+    prefix: Bearer
+    access-token-expire-time: 300000
+    refresh-token-expire-time: 2592000000
+    

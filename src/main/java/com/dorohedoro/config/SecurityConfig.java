@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dorohedoro.auth.ldap.LDAPAuthenticationProvider;
 import com.dorohedoro.auth.ldap.LDAPUserRepo;
+import com.dorohedoro.filter.JwtFilter;
 import com.dorohedoro.filter.PayloadAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +42,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final SecurityProblemSupport securityProblemSupport;
 
     private final LDAPUserRepo ldapUserRepo;
+
+    private final JwtFilter jwtFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -94,12 +97,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling(configurer -> configurer
                         .authenticationEntryPoint(securityProblemSupport)
                         .accessDeniedHandler(securityProblemSupport))
+                // 配置访问权限
                 .authorizeRequests(registry -> registry
                         .antMatchers("/authorize/**").permitAll()
                         .antMatchers("/admin/**").hasRole("ADMIN")
                         .antMatchers("/api/**").hasRole("USER")
-                        .anyRequest().authenticated())
-                .addFilterAt(payloadAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // 替换掉默认过滤器
+                        .anyRequest().authenticated()) //未匹配到的请求要认证后才可以访问
+                .addFilterAt(payloadAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // 替换过滤器
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults());
