@@ -15,7 +15,14 @@ spring:
       connection-timeout: 30000
       max-lifetime: 45000
       auto-commit: true
-      
+  ldap:
+    base: dc=dorohedoro,dc=com
+    embedded:
+      base-dn: dc=dorohedoro,dc=com
+      ldif: classpath:mock-ldap-server.ldif
+      port: 10000
+    urls: ldap://localhost:10000/
+
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

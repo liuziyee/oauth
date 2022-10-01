@@ -1,0 +1,23 @@
+dn: dc=dorohedoro,dc=com
+objectClass: top
+objectClass: domain
+
+dn: uid=kafka,dc=dorohedoro,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: kafka
+sn: kafka
+uid: kafka
+userPassword: 123
+
+dn: uid=rabbit,dc=dorohedoro,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: rabbit
+sn: rabbit
+uid: rabbit
+userPassword: 123

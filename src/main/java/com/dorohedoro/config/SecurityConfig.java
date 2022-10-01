@@ -2,11 +2,14 @@ package com.dorohedoro.config;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.dorohedoro.auth.ldap.LDAPAuthenticationProvider;
+import com.dorohedoro.auth.ldap.LDAPUserRepo;
 import com.dorohedoro.filter.PayloadAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,6 +40,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final SecurityProblemSupport securityProblemSupport;
 
+    private final LDAPUserRepo ldapUserRepo;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         String defaultEncoderId = "bcrypt";
@@ -48,22 +53,37 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public UsernamePasswordAuthenticationFilter payloadAuthenticationFilter() throws Exception {
-        PayloadAuthenticationFilter filter = new PayloadAuthenticationFilter();
-        filter.setAuthenticationSuccessHandler((req, res, auth) -> {
+    public PayloadAuthenticationFilter payloadAuthenticationFilter() throws Exception {
+        PayloadAuthenticationFilter payloadAuthFilter = new PayloadAuthenticationFilter();
+        payloadAuthFilter.setAuthenticationSuccessHandler((req, res, auth) -> {
             res.setStatus(HttpStatus.OK.value());
             res.getWriter().write(JSON.toJSONString(auth));
         });
-        filter.setAuthenticationFailureHandler((req, res, exception) -> {
+        payloadAuthFilter.setAuthenticationFailureHandler((req, res, exception) -> {
             res.setStatus(HttpStatus.UNAUTHORIZED.value());
             JSONObject data = new JSONObject();
             data.put("msg", "Unauthorized");
             data.put("detail", exception.getMessage());
+            res.setContentType("application/json;charset=UTF-8");
             res.getWriter().write(data.toJSONString());
         });
-        filter.setAuthenticationManager(authenticationManager());
-        filter.setFilterProcessesUrl("/authorize/login");
-        return filter;
+        payloadAuthFilter.setAuthenticationManager(authenticationManager());
+        payloadAuthFilter.setFilterProcessesUrl("/authorize/login");
+        return payloadAuthFilter;
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider daoAuthProvider = new DaoAuthenticationProvider();
+        daoAuthProvider.setUserDetailsService(userDetailsService);
+        daoAuthProvider.setUserDetailsPasswordService(userDetailsPasswordService);
+        daoAuthProvider.setPasswordEncoder(passwordEncoder());
+        return daoAuthProvider;
+    }
+
+    @Bean
+    LDAPAuthenticationProvider ldapAuthenticationProvider() {
+        return new LDAPAuthenticationProvider(ldapUserRepo);
     }
 
     @Override
@@ -79,23 +99,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers("/admin/**").hasRole("ADMIN")
                         .antMatchers("/api/**").hasRole("USER")
                         .anyRequest().authenticated())
-                .addFilterAt(payloadAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(payloadAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // 替换掉默认过滤器
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults());
     }
     
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth
-                .userDetailsService(userDetailsService)
-                .userDetailsPasswordManager(userDetailsPasswordService)
-                .passwordEncoder(passwordEncoder());
+                .authenticationProvider(daoAuthenticationProvider())
+                .authenticationProvider(ldapAuthenticationProvider());
     }
 
     @Override
     public void configure(WebSecurity web) {
         web.ignoring().antMatchers("/error/**"); // 绕开过滤器链
     }
-
 }

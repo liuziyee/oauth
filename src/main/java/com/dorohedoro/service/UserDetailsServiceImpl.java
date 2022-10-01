@@ -15,9 +15,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     
     
     @Override
-    // 获取用户信息
+    // 检索用户信息
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userMapper.selectByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("未找到用户名为" + username + "的用户"));
+                .orElseThrow(() -> new UsernameNotFoundException("[MYSQL] 未找到用户名为" + username + "的用户"));
     }
 }

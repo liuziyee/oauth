@@ -26,6 +26,6 @@ public class UserController {
     
     @GetMapping("/principal")
     public Authentication principal() {
-        return SecurityContextHolder.getContext().getAuthentication();
+        return SecurityContextHolder.getContext().getAuthentication(); // 获取认证对象
     }
 }
