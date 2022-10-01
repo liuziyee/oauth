@@ -33,12 +33,8 @@ public class JwtFilter extends OncePerRequestFilter {
         String header = request.getHeader(appProperties.getJwt().getHeader());
         if (header != null && header.startsWith(appProperties.getJwt().getPrefix())) {
             String token = header.replace(appProperties.getJwt().getPrefix(), "");
-            Optional<Claims> optional = validateToken(token);
-            optional.filter(claims -> claims.get("authorities") != null)
-                    .ifPresentOrElse(
-                            this::buildAuthentication,
-                            SecurityContextHolder::clearContext
-                    );
+            validateToken(token).filter(claims -> claims.get("authorities") != null)
+                    .ifPresentOrElse(this::buildAuthentication, SecurityContextHolder::clearContext);
         }
         filterChain.doFilter(request, response);
     }
@@ -46,7 +42,10 @@ public class JwtFilter extends OncePerRequestFilter {
     // 构建认证对象
     private void buildAuthentication(Claims claims) {
         List<?> raws = CollectionUtil.convertObjectToList(claims.get("authorities"));
-        List<SimpleGrantedAuthority> authorities = raws.stream().map(String::valueOf).map(SimpleGrantedAuthority::new).collect(toList());
+        List<SimpleGrantedAuthority> authorities = raws.stream()
+                .map(String::valueOf)
+                .map(SimpleGrantedAuthority::new)
+                .collect(toList());
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(claims.getSubject(), null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }

@@ -1,4 +1,4 @@
-package com.dorohedoro.service;
+package com.dorohedoro.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dorohedoro.domain.User;

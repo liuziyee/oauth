@@ -14,7 +14,6 @@ import java.io.Serializable;
 public class Role implements GrantedAuthority, Serializable {
 
     private Long id;
-
     @TableField("role_name")
     private String authority;
 }

@@ -36,13 +36,9 @@ import java.util.Map;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
     private final UserDetailsService userDetailsService;
-    
     private final UserDetailsPasswordService userDetailsPasswordService;
-
     private final SecurityProblemSupport securityProblemSupport;
-
     private final LDAPUserRepo ldapUserRepo;
-
     private final JwtFilter jwtFilter;
 
     @Bean
@@ -102,7 +98,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers("/authorize/**").permitAll()
                         .antMatchers("/admin/**").hasRole("ADMIN")
                         .antMatchers("/api/**").hasRole("USER")
-                        .anyRequest().authenticated()) //未匹配到的请求要认证后才可以访问
+                        .anyRequest().authenticated()) //未匹配到的资源要认证才可以访问
                 .addFilterAt(payloadAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // 替换过滤器
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // 加入过滤器
                 .csrf(AbstractHttpConfigurer::disable)
