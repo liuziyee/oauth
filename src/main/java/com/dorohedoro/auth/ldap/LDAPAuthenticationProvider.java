@@ -23,7 +23,7 @@ public class LDAPAuthenticationProvider extends AbstractUserDetailsAuthenticatio
     }
 
     @Override
-    // 自定义检索用户信息的方式
+    // 获取用户信息
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         return ldapUserRepo.findByUsernameAndPassword(username, authentication.getCredentials().toString())
                 .orElseThrow(() -> new BadCredentialsException("[LDAP] 用户名或密码错误"));
