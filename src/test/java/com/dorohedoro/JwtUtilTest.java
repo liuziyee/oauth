@@ -29,11 +29,17 @@ public class JwtUtilTest {
     
     @Test
     public void generateJwtToken() {
-        Set<Role> authorities = Set.of(
-                Role.builder().authority("ROLE_USER").build(),
-                Role.builder().authority("ROLE_ADMIN").build());
+        Role userRole = new Role();
+        userRole.setAuthority("ROLE_USER");
 
-        User user = User.builder().username("rabbit").authorities(authorities).build();
+        Role adminRole = new Role();
+        adminRole.setAuthority("ROLE_ADMIN");
+        
+        Set<Role> authorities = Set.of(userRole, adminRole);
+
+        User user = new User();
+        user.setUsername("rabbit");
+        user.setAuthorities(authorities);
 
         String token = jwtUtil.generateAccessToken(user);
         Claims payload = Jwts.parserBuilder()
@@ -43,7 +49,5 @@ public class JwtUtilTest {
                 .getBody();
 
         assertEquals("rabbit", payload.getSubject());
-        
     }
-    
 }

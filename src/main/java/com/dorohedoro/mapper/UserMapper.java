@@ -8,4 +8,11 @@ import java.util.Optional;
 public interface UserMapper extends BaseMapper<User> {
 
     Optional<User> selectByUsername(String username);
+
+    Long countByUsername(String username);
+
+    Long countByEmail(String email);
+    
+    Long countByMobile(String mobile);
+    
 }

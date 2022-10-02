@@ -6,4 +6,9 @@
         <id column="id" jdbcType="BIGINT" property="id" />
         <result column="role_name" jdbcType="VARCHAR" property="authority" />
     </resultMap>
+    
+    <select id="selectByAuthority" resultType="role">
+        select id, role_name from roles where role_name = #{authority}
+    </select>
+    
 </mapper>

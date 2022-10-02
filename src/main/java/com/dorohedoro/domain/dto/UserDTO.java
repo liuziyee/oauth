@@ -1,10 +1,12 @@
 package com.dorohedoro.domain.dto;
 
 import com.dorohedoro.annotation.Password;
+import com.dorohedoro.config.Constants;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -24,4 +26,7 @@ public class UserDTO implements Serializable {
     @NotEmpty
     @Email
     private String email;
+    @NotEmpty
+    @Pattern(regexp = Constants.PATTERN_MOBILE)
+    private String mobile;
 }

@@ -25,4 +25,16 @@
         join roles on users_roles.role_id = roles.id 
         where users.username = #{username};
     </select>
+    
+    <select id="countByUsername" resultType="long">
+        select count(1) from users where username = #{username}
+    </select>
+    
+    <select id="countByEmail" resultType="long">
+        select count(1) from users where email = #{email}
+    </select>
+    
+    <select id="countByMobile" resultType="long">
+        select count(1) from users where mobile = #{mobile}
+    </select>
 </mapper>
