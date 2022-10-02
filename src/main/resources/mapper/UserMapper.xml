@@ -3,7 +3,7 @@
 <mapper namespace="com.dorohedoro.mapper.UserMapper">
 
     <resultMap id="baseResultMap" type="user">
-        <id column="id" jdbcType="BIGINT" property="id" />
+        <id column="user_id" jdbcType="BIGINT" property="id" />
         <result column="username" jdbcType="VARCHAR" property="username" />
         <result column="password_hash" jdbcType="VARCHAR" property="password" />
         <result column="mobile" jdbcType="VARCHAR" property="mobile" />
@@ -12,9 +12,17 @@
         <result column="account_non_expired" jdbcType="TINYINT" property="accountNonExpired" />
         <result column="account_non_locked" jdbcType="TINYINT" property="accountNonLocked" />
         <result column="credentials_non_expired" jdbcType="TINYINT" property="credentialsNonExpired" />
+        <collection property="authorities" ofType="role">
+            <id column="role_id" jdbcType="BIGINT" property="id" />
+            <result column="role_name" jdbcType="VARCHAR" property="authority"/>
+        </collection>
     </resultMap>
     
     <select id="selectByUsername" resultMap="baseResultMap">
-        select id, username, password_hash, mobile, email, enabled, account_non_expired, account_non_locked, credentials_non_expired from users where username = #{username}
+        select users.id as user_id, username, password_hash, mobile, email, enabled, account_non_expired, account_non_locked, credentials_non_expired, roles.id as role_id, role_name
+        from users_roles 
+        join users on users_roles.user_id = users.id 
+        join roles on users_roles.role_id = roles.id 
+        where users.username = #{username};
     </select>
 </mapper>
