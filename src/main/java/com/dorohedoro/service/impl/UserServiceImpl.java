@@ -9,9 +9,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
+
 @Service
 @RequiredArgsConstructor
-public class UserService implements IUserService {
+public class UserServiceImpl implements IUserService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -25,5 +27,14 @@ public class UserService implements IUserService {
                         jwtUtil.generateRefreshToken(user)
                 )) // 生成访问令牌和刷新令牌
                 .orElseThrow(() -> new BadCredentialsException("[MYSQL] 用户名或密码错误"));
+    }
+
+    @Override
+    public Token refreshToken(String accessToken, String refreshToken) throws AccessDeniedException {
+        if (jwtUtil.validateAccessTokenIgnoreExpired(accessToken) && jwtUtil.validateRefreshToken(refreshToken)) {
+            // 访问令牌合法(忽略过期) 且 刷新令牌合法(不忽略过期)
+            return new Token(jwtUtil.refreshAccessToken(refreshToken), refreshToken);
+        }
+        throw new AccessDeniedException("访问被拒绝");
     }
 }

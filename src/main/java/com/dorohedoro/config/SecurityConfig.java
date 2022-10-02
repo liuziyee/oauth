@@ -67,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             res.getWriter().write(data.toJSONString());
         });
         payloadAuthFilter.setAuthenticationManager(authenticationManager());
-        payloadAuthFilter.setFilterProcessesUrl("/authorize/login");
+        payloadAuthFilter.setFilterProcessesUrl("/authorize/payload");
         return payloadAuthFilter;
     }
 

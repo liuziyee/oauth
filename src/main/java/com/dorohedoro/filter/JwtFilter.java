@@ -3,8 +3,8 @@ package com.dorohedoro.filter;
 import com.dorohedoro.config.AppProperties;
 import com.dorohedoro.util.CollectionUtil;
 import com.dorohedoro.util.JwtUtil;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String header = request.getHeader(appProperties.getJwt().getHeader());
         if (header != null && header.startsWith(appProperties.getJwt().getPrefix())) {
-            String token = header.replace(appProperties.getJwt().getPrefix(), "");
+            String token = header.replace(appProperties.getJwt().getPrefix(), "").trim();
             validateToken(token).filter(claims -> claims.get("authorities") != null)
                     .ifPresentOrElse(this::buildAuthentication, SecurityContextHolder::clearContext);
         }
@@ -53,7 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private Optional<Claims> validateToken(String token) {
         try {
             return Optional.of(Jwts.parserBuilder().setSigningKey(JwtUtil.accessKey).build().parseClaimsJws(token).getBody());
-        } catch (Exception e) {
+        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
             return Optional.empty();
         }
     }
