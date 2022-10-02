@@ -26,7 +26,7 @@ public class TotpUtilTest {
     @Test
     public void generateTotp() throws InvalidKeyException, InterruptedException {
         Instant now = Instant.now();
-        Instant nowPlusTimeStep = now.plus(totpUtil.getTimeStep()); // 下一个时间窗口
+        Instant nowPlusTimeStep = now.plus(totpUtil.getTimeStep()); // 下一时间窗口
 
         Key key = totpUtil.generateKey();
         String firstTotp = totpUtil.generateTotp(key, now);
