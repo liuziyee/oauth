@@ -62,6 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         PayloadAuthenticationFilter payloadAuthFilter = new PayloadAuthenticationFilter();
         payloadAuthFilter.setAuthenticationSuccessHandler((req, res, auth) -> {
             res.setStatus(HttpStatus.OK.value());
+            res.setContentType("application/json;charset=UTF-8");
             res.getWriter().write(JSON.toJSONString(auth));
         });
         payloadAuthFilter.setAuthenticationFailureHandler((req, res, exception) -> {

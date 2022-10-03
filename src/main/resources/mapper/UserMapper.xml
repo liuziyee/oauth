@@ -12,18 +12,31 @@
         <result column="account_non_expired" jdbcType="TINYINT" property="accountNonExpired" />
         <result column="account_non_locked" jdbcType="TINYINT" property="accountNonLocked" />
         <result column="credentials_non_expired" jdbcType="TINYINT" property="credentialsNonExpired" />
-        <collection property="authorities" ofType="role">
+        <!--用户角色的一对多关联映射-->
+        <collection property="roles" ofType="role">
             <id column="role_id" jdbcType="BIGINT" property="id" />
-            <result column="role_name" jdbcType="VARCHAR" property="authority"/>
+            <result column="role_name" jdbcType="VARCHAR" property="roleName"/>
+            <result column="role_display_name" jdbcType="VARCHAR" property="displayName"/>
+            <result column="built_in" jdbcType="TINYINT" property="builtIn"/>
+            <!--角色权限的一对多关联映射-->
+            <collection property="permissions" ofType="permission">
+                <id column="permission_id" jdbcType="BIGINT" property="id" />
+                <result column="permission_name" jdbcType="VARCHAR" property="authority"/>
+                <result column="permission_display_name" jdbcType="VARCHAR" property="displayName"/>
+            </collection>
         </collection>
     </resultMap>
     
     <select id="selectByUsername" resultMap="baseResultMap">
-        select users.id as user_id, username, password_hash, mobile, email, enabled, account_non_expired, account_non_locked, credentials_non_expired, roles.id as role_id, role_name
-        from users_roles 
-        join users on users_roles.user_id = users.id 
-        join roles on users_roles.role_id = roles.id 
-        where users.username = #{username};
+        select u.id as user_id, username, password_hash, mobile, email, enabled, account_non_expired, account_non_locked, credentials_non_expired, 
+               r.id as role_id, role_name, r.display_name as role_display_name, built_in,
+               p.id as permission_id, permission_name, p.display_name as permission_display_name
+        from users as u
+        join users_roles as ur on u.id = ur.user_id 
+        join roles as r on ur.role_id = r.id
+        join roles_permissions rp on r.id = rp.role_id
+        join permissions p on rp.permission_id = p.id
+        where u.username = #{username};
     </select>
 
     <select id="selectByEmail" resultType="user">
