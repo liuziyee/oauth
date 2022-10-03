@@ -39,8 +39,8 @@ public class AuthorizeController {
         userService.register(user);
     }
 
-    @PostMapping("/login")
-    public Token login(@RequestBody UserDTO userDTO) {
+    @PostMapping("/token")
+    public Token token(@RequestBody UserDTO userDTO) {
         return userService.login(userDTO.getUsername(), userDTO.getPassword());
     }
     

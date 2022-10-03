@@ -2,6 +2,7 @@ package com.dorohedoro.service;
 
 import com.dorohedoro.domain.User;
 import com.dorohedoro.domain.dto.Token;
+import org.springframework.security.core.Authentication;
 
 import java.nio.file.AccessDeniedException;
 
@@ -13,9 +14,13 @@ public interface IUserService {
 
     void register(User user);
 
+    User getUserByEmail(String email);
+
     Boolean isUsernameExist(String username);
     
     Boolean isEmailExist(String email);
     
     Boolean isMobileExist(String mobile);
+
+    Boolean isYourself(Authentication authentication, String username);
 }

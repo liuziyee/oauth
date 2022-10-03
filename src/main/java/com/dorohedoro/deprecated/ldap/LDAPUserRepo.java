@@ -1,4 +1,4 @@
-package com.dorohedoro.auth.ldap;
+package com.dorohedoro.deprecated.ldap;
 
 import org.springframework.data.ldap.repository.LdapRepository;
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package com.dorohedoro.auth.ldap;
+package com.dorohedoro.deprecated.ldap;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;

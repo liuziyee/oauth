@@ -1,4 +1,4 @@
-package com.dorohedoro.auth.ldap;
+package com.dorohedoro.deprecated.ldap;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;

@@ -12,6 +12,7 @@ import com.dorohedoro.service.IUserService;
 import com.dorohedoro.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +60,11 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public User getUserByEmail(String email) {
+        return userMapper.selectByEmail(email).orElseThrow();
+    }
+
+    @Override
     public Boolean isUsernameExist(String username) {
         return userMapper.countByUsername(username) > 0;
     }
@@ -71,5 +77,10 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Boolean isMobileExist(String mobile) {
         return userMapper.countByMobile(mobile) > 0;
+    }
+
+    @Override
+    public Boolean isYourself(Authentication authentication, String username) {
+        return authentication.getName().equals(username);
     }
 }

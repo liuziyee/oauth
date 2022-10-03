@@ -25,6 +25,10 @@
         join roles on users_roles.role_id = roles.id 
         where users.username = #{username};
     </select>
+
+    <select id="selectByEmail" resultType="user">
+        select id, username, password_hash, mobile, email, enabled, account_non_expired, account_non_locked, credentials_non_expired from users where email = #{email}
+    </select>
     
     <select id="countByUsername" resultType="long">
         select count(1) from users where username = #{username}

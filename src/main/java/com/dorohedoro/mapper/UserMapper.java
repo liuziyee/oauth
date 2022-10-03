@@ -9,10 +9,11 @@ public interface UserMapper extends BaseMapper<User> {
 
     Optional<User> selectByUsername(String username);
 
+    Optional<User> selectByEmail(String email);
+
     Long countByUsername(String username);
 
     Long countByEmail(String email);
     
     Long countByMobile(String mobile);
-    
 }

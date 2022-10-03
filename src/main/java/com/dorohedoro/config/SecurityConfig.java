@@ -2,14 +2,16 @@ package com.dorohedoro.config;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.dorohedoro.auth.ldap.LDAPAuthenticationProvider;
-import com.dorohedoro.auth.ldap.LDAPUserRepo;
+import com.dorohedoro.deprecated.ldap.LDAPAuthenticationProvider;
+import com.dorohedoro.deprecated.ldap.LDAPUserRepo;
 import com.dorohedoro.filter.JwtFilter;
 import com.dorohedoro.filter.PayloadAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -26,8 +28,12 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
+import java.util.Arrays;
 import java.util.Map;
 
 @EnableWebSecurity(debug = true)
@@ -67,7 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             res.getWriter().write(data.toJSONString());
         });
         payloadAuthFilter.setAuthenticationManager(authenticationManager());
-        payloadAuthFilter.setFilterProcessesUrl("/authorize/payload");
+        payloadAuthFilter.setFilterProcessesUrl("/authorize/login");
         return payloadAuthFilter;
     }
 
@@ -84,6 +90,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     LDAPAuthenticationProvider ldapAuthenticationProvider() {
         return new LDAPAuthenticationProvider(ldapUserRepo);
     }
+    
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy(
+                "ROLE_ADMIN > ROLE_MANAGER\n" +
+                "ROLE_MANAGER > ROLE_USER"); // 配置角色包含关系
+        return roleHierarchy;
+    }
+    
+    @Bean
+    // 配置跨域
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "OPTIONS"));
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addExposedHeader("X-Authenticate"); // 暴露响应头
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+        return urlBasedCorsConfigurationSource;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -93,13 +121,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling(configurer -> configurer
                         .authenticationEntryPoint(securityProblemSupport)
                         .accessDeniedHandler(securityProblemSupport))
-                // 配置访问权限
+                .cors(configurer -> configurer.configurationSource(corsConfigurationSource()))
+                // 配置URL级别的访问控制
                 .authorizeRequests(registry -> registry
                         .antMatchers("/authorize/**").permitAll()
+                        //.antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .antMatchers("/admin/**").hasRole("ADMIN")
+                        //.antMatchers("/api/greeting/{username}").access("hasRole('ADMIN') or @userServiceImpl.isYourself(authentication, #username)")
+                        .antMatchers("/api/user/{email}").hasRole("MANAGER")
+                        .antMatchers("/api/greeting/{username}").access("hasRole('ADMIN') or authentication.name.equals(#username)")
                         .antMatchers("/api/**").hasRole("USER")
-                        .anyRequest().authenticated()) //未匹配到的资源要认证才可以访问
-                .addFilterAt(payloadAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // 替换过滤器
+                        .anyRequest().authenticated())
+                // 替换过滤器
+                //.addFilterAt(payloadAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // 加入过滤器
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -109,8 +143,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
         auth
-                .authenticationProvider(daoAuthenticationProvider())
-                .authenticationProvider(ldapAuthenticationProvider());
+                //.authenticationProvider(ldapAuthenticationProvider())
+                .authenticationProvider(daoAuthenticationProvider());
     }
 
     @Override

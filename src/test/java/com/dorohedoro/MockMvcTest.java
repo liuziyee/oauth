@@ -1,6 +1,6 @@
 package com.dorohedoro;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +12,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
+@WithMockUser(username = "rabbit", roles = "MANAGER")
 public class MockMvcTest {
 
     @Autowired
@@ -24,7 +26,7 @@ public class MockMvcTest {
 
     private MockMvc mockMvc;
     
-    @BeforeAll
+    @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
@@ -33,9 +35,16 @@ public class MockMvcTest {
     }
     
     @Test
-    @WithMockUser // 模拟用户
     public void getApiGreeting() throws Exception {
-        mockMvc.perform(get("/api/greeting"))
+        mockMvc.perform(get("/api/greeting/{username}", "rabbit"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getApiUserByEmail() throws Exception {
+        mockMvc.perform(get("/api/user/{email}", "dorohedoro@163.com"))
+                .andDo(print())
                 .andExpect(status().isOk());
     }
 }
