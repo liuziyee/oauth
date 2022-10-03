@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -40,7 +41,7 @@ public class User implements UserDetails, Serializable {
 
     private boolean credentialsNonExpired;
     @JSONField(serialize = false)
-    private Set<Role> roles; // 角色集合
+    private Set<Role> roles = new HashSet<>(); // 这里为了规避空指针做了初始化
 
     @Override
     public boolean isAccountNonExpired() {

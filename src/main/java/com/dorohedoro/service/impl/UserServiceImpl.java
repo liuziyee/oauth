@@ -51,8 +51,8 @@ public class UserServiceImpl implements IUserService {
     public void register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userMapper.insert(user);
-        
-        Role defaultRole = roleMapper.selectByAuthority(Constants.ROLE_USER);
+
+        Role defaultRole = roleMapper.selectByRolename(Constants.ROLE_USER).get(0);
         UserRole userRole = new UserRole();
         userRole.setUserId(user.getId());
         userRole.setRoleId(defaultRole.getId());

@@ -1,5 +1,7 @@
 package com.dorohedoro;
 
+import com.dorohedoro.service.IRoleService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,10 +14,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Slf4j
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @WithMockUser(username = "rabbit", roles = "MANAGER")
@@ -23,6 +26,9 @@ public class MockMvcTest {
 
     @Autowired
     private WebApplicationContext context;
+
+    @Autowired
+    private IRoleService roleService;
 
     private MockMvc mockMvc;
     
@@ -46,5 +52,10 @@ public class MockMvcTest {
         mockMvc.perform(get("/api/user/{email}", "dorohedoro@163.com"))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void getRoleHierarchyExpr() {
+        log.info("角色权限包含关系: {}", roleService.getRoleHierarchyExpr());
     }
 }
