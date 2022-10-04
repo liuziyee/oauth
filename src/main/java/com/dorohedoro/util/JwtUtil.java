@@ -65,7 +65,7 @@ public class JwtUtil {
     public String generateJwtToken(UserDetails userDetails, Long timeToExpire, Key key) {
         return Jwts.builder()
                 .claim("authorities",
-                        userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(toList()))
+                        userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(toList())) // 存入权限列表
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + timeToExpire))

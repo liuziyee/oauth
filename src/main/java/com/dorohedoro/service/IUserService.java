@@ -14,6 +14,8 @@ public interface IUserService {
 
     void register(User user);
 
+    void updateUser(User user);
+
     User getUserByEmail(String email);
 
     Boolean isUsernameExist(String username);
@@ -22,5 +24,5 @@ public interface IUserService {
     
     Boolean isMobileExist(String mobile);
 
-    Boolean isYourself(Authentication authentication, String username);
+    Boolean isUserself(Authentication authentication, String username);
 }

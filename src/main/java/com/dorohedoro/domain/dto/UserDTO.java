@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Data
-public class UserDTO implements Serializable {
+public class UserDTO extends PageBean implements Serializable {
 
     private Long id;
     @NotEmpty

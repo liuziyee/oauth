@@ -27,20 +27,36 @@
         </collection>
     </resultMap>
     
-    <select id="selectByUsername" resultMap="baseResultMap">
-        select u.id as user_id, username, password_hash, mobile, email, enabled, account_non_expired, account_non_locked, credentials_non_expired, 
+    <sql id="baseSelectSql">
+        select u.id as user_id, username, password_hash, mobile, email, enabled, account_non_expired, account_non_locked, credentials_non_expired,
                r.id as role_id, role_name, r.display_name as role_display_name, built_in,
                p.id as permission_id, permission_name, p.display_name as permission_display_name
         from users as u
-        join users_roles as ur on u.id = ur.user_id 
-        join roles as r on ur.role_id = r.id
-        join roles_permissions rp on r.id = rp.role_id
-        join permissions p on rp.permission_id = p.id
+                 join users_roles as ur on u.id = ur.user_id
+                 join roles as r on ur.role_id = r.id
+                 join roles_permissions rp on r.id = rp.role_id
+                 join permissions p on rp.permission_id = p.id
+    </sql>
+    
+    <select id="selectByUsername" resultMap="baseResultMap">
+        <include refid="baseSelectSql"/>
         where u.username = #{username};
     </select>
 
-    <select id="selectByEmail" resultType="user">
-        select id, username, password_hash, mobile, email, enabled, account_non_expired, account_non_locked, credentials_non_expired from users where email = #{email}
+    <select id="selectByEmail" resultMap="baseResultMap">
+        select id as user_id, username, password_hash, mobile, email, enabled, account_non_expired, account_non_locked, credentials_non_expired from users where email = #{email}
+    </select>
+
+    <select id="selectPage" resultMap="baseResultMap">
+        <include refid="baseSelectSql"/>
+        <trim prefix="where" prefixOverrides="and">
+            <if test="username != null and username != ''">
+                username = #{username}
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email}
+            </if>
+        </trim>
     </select>
     
     <select id="countByUsername" resultType="long">

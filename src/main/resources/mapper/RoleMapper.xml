@@ -14,17 +14,34 @@
         </collection>
     </resultMap>
     
-    <select id="selectByRolename" resultMap="baseResultMap">
+    <sql id="baseSelectSql">
         select r.id as role_id, role_name, r.display_name as role_display_name, r.built_in,
-               p.id as permission_id, permission_name, p.display_name as permission_display_name
+        p.id as permission_id, permission_name, p.display_name as permission_display_name
         from roles as r
-        <!--保留未分配权限的角色-->    
+        <!--保留未分配权限的角色-->
         left join roles_permissions as rp on r.id = rp.role_id
         left join permissions as p on rp.permission_id = p.id
+    </sql>
+    
+    <select id="selectByRolename" resultMap="baseResultMap">
+        <include refid="baseSelectSql"/>
         <trim prefix="where" prefixOverrides="and">
             <if test="rolename != null and rolename != ''">
                 role_name = #{rolename}
             </if>
         </trim>
+    </select>
+    
+    <select id="selectById" resultMap="baseResultMap">
+        <include refid="baseSelectSql"></include>
+        where r.id = #{id}
+    </select>
+    
+    <select id="selectByIds" resultMap="baseResultMap">
+        <include refid="baseSelectSql"/>
+        where r.id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </select>
 </mapper>

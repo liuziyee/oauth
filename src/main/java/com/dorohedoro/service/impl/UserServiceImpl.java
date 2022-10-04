@@ -1,6 +1,7 @@
 package com.dorohedoro.service.impl;
 
-import com.dorohedoro.config.Constants;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.dorohedoro.annotation.RoleAdminOrUserselfWithUserParam;
 import com.dorohedoro.domain.Role;
 import com.dorohedoro.domain.User;
 import com.dorohedoro.domain.UserRole;
@@ -17,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
+
+import static com.dorohedoro.config.Constants.ROLE_USER;
 
 @Service
 @RequiredArgsConstructor
@@ -52,11 +55,17 @@ public class UserServiceImpl implements IUserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userMapper.insert(user);
 
-        Role defaultRole = roleMapper.selectByRolename(Constants.ROLE_USER).get(0);
-        UserRole userRole = new UserRole();
-        userRole.setUserId(user.getId());
-        userRole.setRoleId(defaultRole.getId());
-        userRoleMapper.insert(userRole);
+        Role userRole = roleMapper.selectByRolename(ROLE_USER).get(0);
+        UserRole userToRole = new UserRole();
+        userToRole.setUserId(user.getId());
+        userToRole.setRoleId(userRole.getId());
+        userRoleMapper.insert(userToRole);
+    }
+
+    @Override
+    @RoleAdminOrUserselfWithUserParam
+    public void updateUser(User user) {
+        userMapper.update(user, Wrappers.<User>lambdaQuery().eq(User::getId, user.getId()));
     }
 
     @Override
@@ -80,7 +89,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public Boolean isYourself(Authentication authentication, String username) {
+    public Boolean isUserself(Authentication authentication, String username) {
         return authentication.getName().equals(username);
     }
 }

@@ -96,8 +96,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         roleHierarchy.setHierarchy(
-                "ROLE_ADMIN > ROLE_MANAGER\n" +
-                "ROLE_MANAGER > ROLE_USER"); // 配置角色包含关系
+                "ROLE_ADMIN > ROLE_STAFF\n" +
+                "ROLE_STAFF > ROLE_USER"); // 配置角色包含关系
         return roleHierarchy;
     }
     
@@ -108,7 +108,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         corsConfiguration.addAllowedOrigin("*");
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "OPTIONS"));
         corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.addExposedHeader("X-Authenticate"); // 暴露响应头
+        corsConfiguration.addExposedHeader("X-Authenticate");
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
         urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
         return urlBasedCorsConfigurationSource;
@@ -128,7 +128,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers("/authorize/**").permitAll()
                         //.antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .antMatchers("/admin/**").hasRole("ADMIN")
-                        //.antMatchers("/api/greeting/{username}").access("hasRole('ADMIN') or @userServiceImpl.isYourself(authentication, #username)")
+                        //.antMatchers("/api/greeting/{username}").access("hasRole('ADMIN') or @userServiceImpl.isUserself(authentication, #username)")
                         .antMatchers("/api/user/{email}").hasRole("MANAGER")
                         .antMatchers("/api/greeting/{username}").access("hasRole('ADMIN') or authentication.name.equals(#username)")
                         .antMatchers("/api/**").hasRole("USER")

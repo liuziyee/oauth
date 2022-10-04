@@ -4,6 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.dorohedoro.domain.dto.PageBean;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,7 +20,7 @@ import static java.util.stream.Collectors.toSet;
 
 @Data
 @TableName("users")
-public class User implements UserDetails, Serializable {
+public class User extends PageBean implements UserDetails, Serializable {
 
     @TableId
     private Long id;
@@ -42,6 +43,8 @@ public class User implements UserDetails, Serializable {
     private boolean credentialsNonExpired;
     @JSONField(serialize = false)
     private Set<Role> roles = new HashSet<>(); // 这里为了规避空指针做了初始化
+    
+    // TODO 两个字段 usingMfa mfaKey
 
     @Override
     public boolean isAccountNonExpired() {
