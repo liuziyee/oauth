@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.dorohedoro.config.Constants.ROLE_STAFF;
+import static com.dorohedoro.config.Constants.*;
 import static java.util.stream.Collectors.toSet;
 
 @Service
@@ -30,9 +30,9 @@ public class UserAdminServiceImpl implements IUserAdminService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    // TODO 预校验注解
+    // TODO 预授权注解
     public Page<User> getAll(User user) {
-        Page<User> page = new Page(user.getPage(), user.getSize());
+        Page<User> page = new Page(user.getPage() + PAGE_OFFSET, PAGE_SIZE);
         return userMapper.selectPage(page, user);
     }
 
@@ -69,6 +69,7 @@ public class UserAdminServiceImpl implements IUserAdminService {
     }
 
     @Override
+    // 用户分配角色
     public User assignRoles(String username, List<Long> roleIds) {
         Set<Role> roles = roleMapper.selectByIds(roleIds);
         return userMapper.selectByUsername(username)

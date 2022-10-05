@@ -16,7 +16,7 @@
     
     <sql id="baseSelectSql">
         select r.id as role_id, role_name, r.display_name as role_display_name, r.built_in,
-        p.id as permission_id, permission_name, p.display_name as permission_display_name
+               p.id as permission_id, permission_name, p.display_name as permission_display_name
         from roles as r
         <!--保留未分配权限的角色-->
         left join roles_permissions as rp on r.id = rp.role_id
@@ -33,7 +33,7 @@
     </select>
     
     <select id="selectById" resultMap="baseResultMap">
-        <include refid="baseSelectSql"></include>
+        <include refid="baseSelectSql"/>
         where r.id = #{id}
     </select>
     
@@ -46,10 +46,10 @@
     </select>
     
     <select id="selectPage" resultMap="baseResultMap">
-        <include refid="baseSelectSql"></include>
+        <include refid="baseSelectSql"/>
         <trim prefix="where" prefixOverrides="and">
-            <if test="rolename != null and rolename != ''">
-                role_name = #{rolename}
+            <if test="role.rolename != null and role.rolename != ''">
+                role_name = #{role.rolename}
             </if>
         </trim>
     </select>

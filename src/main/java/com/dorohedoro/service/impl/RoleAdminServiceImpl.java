@@ -31,11 +31,11 @@ public class RoleAdminServiceImpl implements IRoleAdminService {
     private final UserRoleMapper userRoleMapper;
     private final RolePermissionMapper rolePermissionMapper;
 
-    // TODO 刷新角色包含关系注解 预校验注解
+    // TODO 刷新角色包含关系注解 预授权注解
 
     @Override
     public Page<Role> getAll(Role role) {
-        Page page = new Page(role.getPage(), role.getSize());
+        Page page = new Page(role.getPage(), role.getOffset());
         return roleMapper.selectPage(page, role);
     }
 

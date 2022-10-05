@@ -13,7 +13,7 @@
     </sql>
     
     <select id="selectByIds" resultMap="baseResultMap">
-        <include refid="baseSelectSql">
+        <include refid="baseSelectSql"/>
         where id in
         <foreach collection="ids" item="id" open="(" close=")" separator=",">
             #{id}

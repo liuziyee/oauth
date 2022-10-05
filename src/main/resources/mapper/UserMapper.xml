@@ -32,10 +32,10 @@
                r.id as role_id, role_name, r.display_name as role_display_name, built_in,
                p.id as permission_id, permission_name, p.display_name as permission_display_name
         from users as u
-                 join users_roles as ur on u.id = ur.user_id
-                 join roles as r on ur.role_id = r.id
-                 join roles_permissions rp on r.id = rp.role_id
-                 join permissions p on rp.permission_id = p.id
+        join users_roles as ur on u.id = ur.user_id
+        join roles as r on ur.role_id = r.id
+        join roles_permissions rp on r.id = rp.role_id
+        join permissions p on rp.permission_id = p.id
     </sql>
     
     <select id="selectByUsername" resultMap="baseResultMap">
@@ -50,11 +50,11 @@
     <select id="selectPage" resultMap="baseResultMap">
         <include refid="baseSelectSql"/>
         <trim prefix="where" prefixOverrides="and">
-            <if test="username != null and username != ''">
-                username = #{username}
+            <if test="user.username != null and user.username != ''">
+                u.username = #{user.username}
             </if>
-            <if test="email != null and email != ''">
-                email = #{email}
+            <if test="user.email != null and user.email != ''">
+                u.email = #{user.email}
             </if>
         </trim>
     </select>

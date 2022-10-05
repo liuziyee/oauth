@@ -3,12 +3,12 @@ package com.dorohedoro.service.impl;
 import com.dorohedoro.domain.Permission;
 import com.dorohedoro.mapper.PermissionMapper;
 import com.dorohedoro.service.IPermissionAdminService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Data
+@Service
 @RequiredArgsConstructor
 public class PermissionAdminServiceImpl implements IPermissionAdminService {
 
