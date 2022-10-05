@@ -28,7 +28,7 @@ public class MybatisPlusGenerator {
                     builder.parent("com.dorohedoro")
                             .pathInfo(Collections.singletonMap(OutputFile.xml, "C:/mybatis-plus//com//dorohedoro"));
                 })
-                .strategyConfig(builder -> builder.addInclude("permissions"))
+                .strategyConfig(builder -> builder.addInclude("roles_permissions"))
                 .templateEngine(new FreemarkerTemplateEngine())
                 .execute();
     }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dorohedoro.mapper.PermissionMapper">
+
+    <resultMap id="baseResultMap" type="permission">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="permission_name" jdbcType="VARCHAR" property="authority" />
+        <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+    </resultMap>
+    
+    <sql id="baseSelectSql">
+        select id, permission_name, display_name from permission
+    </sql>
+    
+    <select id="selectByIds" resultMap="baseResultMap">
+        <include refid="baseSelectSql">
+        where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectByAuthority" resultMap="baseResultMap">
+        <include refid="baseSelectSql"/>
+        <trim prefix="where" prefixOverrides="and">
+            <if test="authority != null and authority != ''">
+                permission_name = #{authority}
+            </if>
+        </trim>
+    </select>
+</mapper>

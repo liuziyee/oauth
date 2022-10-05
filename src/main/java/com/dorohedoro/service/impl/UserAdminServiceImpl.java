@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toSet;
 
 @Service
 @RequiredArgsConstructor
-public class UserAdminService implements IUserAdminService {
+public class UserAdminServiceImpl implements IUserAdminService {
 
     private final UserMapper userMapper;
     private final RoleMapper roleMapper;
@@ -30,7 +30,7 @@ public class UserAdminService implements IUserAdminService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    // TODO 自定义预校验注解
+    // TODO 预校验注解
     public Page<User> getAll(User user) {
         Page<User> page = new Page(user.getPage(), user.getSize());
         return userMapper.selectPage(page, user);
@@ -53,6 +53,19 @@ public class UserAdminService implements IUserAdminService {
         userRoleMapper.insert(userToRole);
 
         return user;
+    }
+
+    @Override
+    public User update(String username, User user) {
+        return userMapper.selectByUsername(username)
+                .map(toSave -> {
+                    toSave.setUsername(user.getUsername());
+                    toSave.setEmail(user.getEmail());
+                    toSave.setMobile(user.getMobile());
+                    userMapper.insert(toSave);
+                    return toSave;
+                })
+                .orElseThrow(() -> new InvalidParamProblem("用户名" + username + "不存在"));
     }
 
     @Override

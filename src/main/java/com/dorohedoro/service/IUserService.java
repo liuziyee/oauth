@@ -24,5 +24,7 @@ public interface IUserService {
     
     Boolean isMobileExist(String mobile);
 
+    void validateUserUniqueFields(String username, String email, String mobile);
+
     Boolean isUserself(Authentication authentication, String username);
 }

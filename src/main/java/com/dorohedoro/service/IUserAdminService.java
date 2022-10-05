@@ -16,6 +16,8 @@ public interface IUserAdminService {
 
     User create(User user);
 
+    User update(String username, User user);
+
     User assignRoles(String username, List<Long> roleIds);
 
     User toggleEnabled(String username);

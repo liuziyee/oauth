@@ -22,7 +22,7 @@
         left join roles_permissions as rp on r.id = rp.role_id
         left join permissions as p on rp.permission_id = p.id
     </sql>
-    
+
     <select id="selectByRolename" resultMap="baseResultMap">
         <include refid="baseSelectSql"/>
         <trim prefix="where" prefixOverrides="and">
@@ -43,5 +43,18 @@
         <foreach collection="ids" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
+    </select>
+    
+    <select id="selectPage" resultMap="baseResultMap">
+        <include refid="baseSelectSql"></include>
+        <trim prefix="where" prefixOverrides="and">
+            <if test="rolename != null and rolename != ''">
+                role_name = #{rolename}
+            </if>
+        </trim>
+    </select>
+
+    <select id="countByRolename" resultType="long">
+        select count(1) from roles where role_name = #{rolename}
     </select>
 </mapper>

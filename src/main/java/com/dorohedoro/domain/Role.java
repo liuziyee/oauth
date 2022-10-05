@@ -3,6 +3,7 @@ package com.dorohedoro.domain;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.dorohedoro.domain.dto.PageBean;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @Data
 @TableName("roles")
-public class Role implements Serializable {
+public class Role extends PageBean implements Serializable {
 
     @TableId
     private Long id;

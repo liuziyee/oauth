@@ -6,6 +6,7 @@ import com.dorohedoro.domain.Role;
 import com.dorohedoro.domain.User;
 import com.dorohedoro.domain.UserRole;
 import com.dorohedoro.domain.dto.Token;
+import com.dorohedoro.exception.DuplicateProblem;
 import com.dorohedoro.mapper.RoleMapper;
 import com.dorohedoro.mapper.UserMapper;
 import com.dorohedoro.mapper.UserRoleMapper;
@@ -86,6 +87,21 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Boolean isMobileExist(String mobile) {
         return userMapper.countByMobile(mobile) > 0;
+    }
+
+    @Override
+    public void validateUserUniqueFields(String username, String email, String mobile) throws DuplicateProblem {
+        if (isUsernameExist(username)) {
+            throw new DuplicateProblem("用户名重复");
+        }
+
+        if (isEmailExist(email)){
+            throw new DuplicateProblem("电子邮件地址重复");
+        }
+
+        if (isMobileExist(mobile)) {
+            throw new DuplicateProblem("手机号重复");
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.dorohedoro.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dorohedoro.domain.Role;
 
 import java.util.List;
@@ -14,5 +15,8 @@ public interface RoleMapper extends BaseMapper<Role> {
     Optional<Role> selectById(Long id);
 
     Set<Role> selectByIds(List<Long> ids);
-    
+
+    Page<Role> selectPage(Page<Role> page, Role role);
+
+    Long countByRolename(String rolename);
 }
