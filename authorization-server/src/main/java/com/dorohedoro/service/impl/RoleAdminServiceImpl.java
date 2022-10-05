@@ -2,6 +2,9 @@ package com.dorohedoro.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dorohedoro.annotation.RefreshRoleHierarchy;
+import com.dorohedoro.annotation.RoleAdmin;
+import com.dorohedoro.annotation.RoleAdminOrAuthorityUserRead;
 import com.dorohedoro.domain.Permission;
 import com.dorohedoro.domain.Role;
 import com.dorohedoro.domain.RolePermission;
@@ -33,9 +36,9 @@ public class RoleAdminServiceImpl implements IRoleAdminService {
     private final UserRoleMapper userRoleMapper;
     private final RolePermissionMapper rolePermissionMapper;
 
-    // TODO 刷新角色包含关系注解 预授权注解
-
     @Override
+    @RefreshRoleHierarchy // 刷新角色包含关系
+    @RoleAdmin // 自定义预授权注解
     public Page<Role> getAll(Role role) {
         Page page = new Page(role.getPage() + PAGE_OFFSET, PAGE_SIZE);
         return roleMapper.selectPage(page, role);
@@ -52,6 +55,8 @@ public class RoleAdminServiceImpl implements IRoleAdminService {
     }
 
     @Override
+    @RefreshRoleHierarchy
+    @RoleAdmin
     public Role updateRole(Long id, Role role) {
         String roleName = role.getRoleName();
         if (isRolenameExist(roleName)) {
@@ -64,6 +69,8 @@ public class RoleAdminServiceImpl implements IRoleAdminService {
     }
 
     @Override
+    @RefreshRoleHierarchy
+    @RoleAdmin
     public void deleteRole(Long id) {
         if (isRoleAssigned(id)) throw new DataConflictProblem("该角色已分配给用户");
 
@@ -77,6 +84,8 @@ public class RoleAdminServiceImpl implements IRoleAdminService {
     }
 
     @Override
+    @RefreshRoleHierarchy
+    @RoleAdmin
     // 更新角色分配的权限
     public Role updatePermissions(Long id, List<Long> permissionIds) {
         return roleMapper.selectById(id)
@@ -102,6 +111,7 @@ public class RoleAdminServiceImpl implements IRoleAdminService {
     }
 
     @Override
+    @RoleAdminOrAuthorityUserRead
     // 获取可用权限(即当前角色未分配的权限)
     public Set<Permission> getAvailablePermissions(Long id) {
         return roleMapper.selectById(id)

@@ -1,7 +1,7 @@
 package com.dorohedoro.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.dorohedoro.annotation.RoleAdminOrUserselfWithUserParam;
+import com.dorohedoro.annotation.RoleAdminOrAuthorityUserUpdateOrUserselfWithUserParam;
 import com.dorohedoro.domain.Role;
 import com.dorohedoro.domain.User;
 import com.dorohedoro.domain.UserRole;
@@ -64,7 +64,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    @RoleAdminOrUserselfWithUserParam
+    @RoleAdminOrAuthorityUserUpdateOrUserselfWithUserParam
     public void updateUser(User user) {
         userMapper.update(user, Wrappers.<User>lambdaQuery().eq(User::getId, user.getId()));
     }

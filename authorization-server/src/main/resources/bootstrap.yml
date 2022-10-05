@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 10000
 
 spring:
   datasource:
@@ -20,8 +20,8 @@ spring:
     embedded:
       base-dn: dc=dorohedoro,dc=com
       ldif: classpath:mock-ldap-server.ldif
-      port: 10000
-    urls: ldap://localhost:10000/
+      port: 40000
+    urls: ldap://localhost:40000/
 
 mybatis-plus:
   configuration:

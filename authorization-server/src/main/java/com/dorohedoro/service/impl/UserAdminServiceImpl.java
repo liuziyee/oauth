@@ -1,6 +1,10 @@
 package com.dorohedoro.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dorohedoro.annotation.RoleAdminAndNotUserselfWithUsernameParam;
+import com.dorohedoro.annotation.RoleAdminOrAuthorityUserCreate;
+import com.dorohedoro.annotation.RoleAdminOrAuthorityUserRead;
+import com.dorohedoro.annotation.RoleAdminOrAuthorityUserUpdate;
 import com.dorohedoro.domain.Role;
 import com.dorohedoro.domain.User;
 import com.dorohedoro.domain.UserRole;
@@ -30,18 +34,20 @@ public class UserAdminServiceImpl implements IUserAdminService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    // TODO 预授权注解
+    @RoleAdminOrAuthorityUserRead
     public Page<User> getAll(User user) {
         Page<User> page = new Page(user.getPage() + PAGE_OFFSET, PAGE_SIZE);
         return userMapper.selectPage(page, user);
     }
 
     @Override
+    @RoleAdminOrAuthorityUserRead
     public Optional<User> getByUsername(String username) {
         return userMapper.selectByUsername(username);
     }
 
     @Override
+    @RoleAdminOrAuthorityUserCreate
     public User create(User user) {
         Role staffRole = roleMapper.selectByRolename(ROLE_STAFF).get(0);
         user.setPassword(passwordEncoder.encode("12345")); // TODO 密码工具类
@@ -56,6 +62,7 @@ public class UserAdminServiceImpl implements IUserAdminService {
     }
 
     @Override
+    @RoleAdminOrAuthorityUserUpdate
     public User update(String username, User user) {
         return userMapper.selectByUsername(username)
                 .map(toSave -> {
@@ -69,7 +76,8 @@ public class UserAdminServiceImpl implements IUserAdminService {
     }
 
     @Override
-    // 用户分配角色
+    @RoleAdminOrAuthorityUserUpdate
+    // 分配角色给用户
     public User assignRoles(String username, List<Long> roleIds) {
         Set<Role> roles = roleMapper.selectByIds(roleIds);
         return userMapper.selectByUsername(username)
@@ -89,6 +97,7 @@ public class UserAdminServiceImpl implements IUserAdminService {
     }
 
     @Override
+    @RoleAdminAndNotUserselfWithUsernameParam
     public User toggleEnabled(String username) {
         return userMapper.selectByUsername(username)
                 .map(user -> {
@@ -100,6 +109,7 @@ public class UserAdminServiceImpl implements IUserAdminService {
     }
 
     @Override
+    @RoleAdminOrAuthorityUserRead
     // 获取用户的可分配角色列表
     public Set<Role> getAvailableRoles(String username) {
         return userMapper.selectByUsername(username)
