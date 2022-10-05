@@ -6,6 +6,7 @@ import com.dorohedoro.util.JwtUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
@@ -39,7 +41,7 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // 构建认证对象
+    // 构建认证对象放入上下文
     private void buildAuthentication(Claims claims) {
         List<?> raws = CollectionUtil.convertObjectToList(claims.get("authorities"));
         List<SimpleGrantedAuthority> authorities = raws.stream()
@@ -54,6 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             return Optional.of(Jwts.parserBuilder().setSigningKey(JwtUtil.accessKey).build().parseClaimsJws(token).getBody());
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
             return Optional.empty();
         }
     }

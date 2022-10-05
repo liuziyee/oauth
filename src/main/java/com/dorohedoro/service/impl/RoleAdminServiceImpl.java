@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
+import static com.dorohedoro.config.Constants.PAGE_OFFSET;
+import static com.dorohedoro.config.Constants.PAGE_SIZE;
 import static java.util.stream.Collectors.toSet;
 
 @Service
@@ -35,7 +37,7 @@ public class RoleAdminServiceImpl implements IRoleAdminService {
 
     @Override
     public Page<Role> getAll(Role role) {
-        Page page = new Page(role.getPage(), role.getOffset());
+        Page page = new Page(role.getPage() + PAGE_OFFSET, PAGE_SIZE);
         return roleMapper.selectPage(page, role);
     }
 

@@ -34,6 +34,7 @@ public class AdminController {
     @GetMapping("/users")
     public PageBean<UserDTO> getAllUsers(UserDTO userDTO) {
         Page<User> page = userAdminService.getAll(BeanUtil.copy(userDTO, User.class));
+        
         PageBean<UserDTO> pageBean = new PageBean<>();
         pageBean.setPage(page.getCurrent()); // 页码
         pageBean.setOffset((page.getCurrent() - 1) * page.getSize()); // 偏移量
@@ -78,8 +79,9 @@ public class AdminController {
     }
 
     @GetMapping("/roles")
-    public PageBean<RoleDTO> getAllRoles(@RequestBody RoleDTO roleDTO) {
+    public PageBean<RoleDTO> getAllRoles(RoleDTO roleDTO) {
         Page<Role> page = roleAdminService.getAll(BeanUtil.copy(roleDTO, Role.class));
+        
         PageBean<RoleDTO> pageBean = new PageBean<>();
         pageBean.setPage(page.getCurrent());
         pageBean.setOffset((page.getCurrent() - 1) * page.getSize());
