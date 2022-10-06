@@ -22,6 +22,11 @@ spring:
       ldif: classpath:mock-ldap-server.ldif
       port: 40000
     urls: ldap://localhost:40000/
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:10000/.well-known/jwks.json # 获取公钥端点
 
 mybatis-plus:
   configuration:
@@ -44,4 +49,8 @@ app:
     prefix: Bearer
     access-token-expire-time: 300000
     refresh-token-expire-time: 2592000000
+  jwks:
+    pass-phrase: dorohedoro
+    alias: oauth-jwks
+    key-store: oauth-jwks.keystore
     

@@ -10,6 +10,10 @@ public class AppProperties {
     @Getter
     @Setter
     private Jwt jwt = new Jwt();
+
+    @Getter
+    @Setter
+    private JwkSet jwks = new JwkSet();
     
     @Getter
     @Setter
@@ -18,5 +22,13 @@ public class AppProperties {
         private String prefix = "Bearer";
         private Long accessTokenExpireTime = 60_000L; // 访问令牌过期时间
         private Long refreshTokenExpireTime = 30 * 24 * 3600 * 1000L; // 刷新令牌过期时间
+    }
+
+    @Getter
+    @Setter
+    public static class JwkSet {
+        private String passPhrase = "dorohedoro";
+        private String alias = "oauth-jwks";
+        private String keyStore = "oauth-jwks.keystore";
     }
 }

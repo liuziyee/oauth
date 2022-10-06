@@ -9,6 +9,7 @@ import com.dorohedoro.filter.PayloadAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -35,10 +36,11 @@ import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 import java.util.Arrays;
 import java.util.Map;
 
+@Order(10)
 @EnableWebSecurity(debug = true)
 @Import(SecurityProblemSupport.class)
 @RequiredArgsConstructor
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     
     private final UserDetailsService userDetailsService;
     private final UserDetailsPasswordService userDetailsPasswordService;
@@ -124,7 +126,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors(configurer -> configurer.configurationSource(corsConfigurationSource()))
                 // 配置URL级别的访问控制
                 .authorizeRequests(registry -> registry
-                        .antMatchers("/authorize/**").permitAll()
+                        .antMatchers("/authorize/**").permitAll() // 公开访问(会走过滤器链,会给未登录的用户适配一个匿名认证对象)
                         //.antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .antMatchers("/admin/**").hasRole("ADMIN")
                         //.antMatchers("/api/greeting/{username}").access("hasRole('ADMIN') or @userServiceImpl.isUserself(authentication, #username)")
@@ -149,6 +151,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/error/**"); // 绕开过滤器链
+        web.ignoring().antMatchers("/error/**"); // 公开访问(会绕开过滤器链)
     }
 }
