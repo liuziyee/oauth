@@ -40,7 +40,7 @@ import java.util.Map;
 @EnableWebSecurity(debug = true)
 @Import(SecurityProblemSupport.class)
 @RequiredArgsConstructor
-public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
     private final UserDetailsService userDetailsService;
     private final UserDetailsPasswordService userDetailsPasswordService;
