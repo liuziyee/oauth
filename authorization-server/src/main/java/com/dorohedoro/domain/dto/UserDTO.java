@@ -2,6 +2,7 @@ package com.dorohedoro.domain.dto;
 
 import com.dorohedoro.annotation.Password;
 import com.dorohedoro.config.Constants;
+import com.dorohedoro.domain.Role;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Set;
 
 @Data
 public class UserDTO extends PageBean implements Serializable {
@@ -29,4 +31,6 @@ public class UserDTO extends PageBean implements Serializable {
     @NotEmpty
     @Pattern(regexp = Constants.PATTERN_MOBILE)
     private String mobile;
+
+    private Set<Role> roles;
 }
