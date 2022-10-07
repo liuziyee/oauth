@@ -1,20 +1,16 @@
 package com.dorohedoro.config;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.dorohedoro.deprecated.ldap.LDAPAuthenticationProvider;
-import com.dorohedoro.deprecated.ldap.LDAPUserRepo;
-import com.dorohedoro.filter.JwtFilter;
-import com.dorohedoro.filter.PayloadAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,16 +27,18 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+
+import static com.dorohedoro.config.Constants.ROLE_ADMIN;
+import static com.dorohedoro.config.Constants.SCOPE_PREFIX;
+import static java.util.stream.Collectors.toList;
 
 @Order(10)
 @EnableWebSecurity(debug = true)
@@ -47,21 +46,20 @@ import java.util.Map;
 @RequiredArgsConstructor
 // 授权服务器做为资源服务器的安全配置
 public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
-    
+
     private final UserDetailsService userDetailsService;
     private final UserDetailsPasswordService userDetailsPasswordService;
     private final SecurityProblemSupport securityProblemSupport;
-    private final LDAPUserRepo ldapUserRepo;
-    private final JwtFilter jwtFilter;
 
     @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
     private String jwkSetUri;
-    
+
     @Bean
+    // JWT解码器(用于资源服务器验证访问令牌)
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
+        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build(); // 配置获取公钥的访问地址
     }
-    
+
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean(); // 这里是为了支持资源拥有者密码的授权方式
@@ -78,7 +76,7 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
         return new DelegatingPasswordEncoder(defaultEncoderId, encoderMap);
     }
 
-    @Bean
+    /*@Bean
     public PayloadAuthenticationFilter payloadAuthenticationFilter() throws Exception {
         PayloadAuthenticationFilter payloadAuthFilter = new PayloadAuthenticationFilter();
         payloadAuthFilter.setAuthenticationSuccessHandler((req, res, auth) -> {
@@ -97,58 +95,29 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
         payloadAuthFilter.setAuthenticationManager(authenticationManager());
         payloadAuthFilter.setFilterProcessesUrl("/authorize/login");
         return payloadAuthFilter;
-    }
-
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider daoAuthProvider = new DaoAuthenticationProvider();
-        daoAuthProvider.setUserDetailsService(userDetailsService);
-        daoAuthProvider.setUserDetailsPasswordService(userDetailsPasswordService);
-        daoAuthProvider.setPasswordEncoder(passwordEncoder());
-        return daoAuthProvider;
-    }
-
-    @Bean
-    public LDAPAuthenticationProvider ldapAuthenticationProvider() {
-        return new LDAPAuthenticationProvider(ldapUserRepo);
-    }
+    }*/
     
     @Bean
     public RoleHierarchyImpl roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         roleHierarchy.setHierarchy(
                 "ROLE_ADMIN > ROLE_STAFF\n" +
-                "ROLE_STAFF > ROLE_USER"); // 配置角色包含关系
+                        "ROLE_STAFF > ROLE_USER"); // 配置角色包含关系
         return roleHierarchy;
-    }
-    
-    @Bean
-    // 配置跨域
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "OPTIONS"));
-        corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.addExposedHeader("X-Authenticate");
-        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
-        return urlBasedCorsConfigurationSource;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .requestMatchers(configurer -> configurer.mvcMatchers("/api/**", "/admin/**", "/authorize/**"))
-                .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 禁用会话
                 .exceptionHandling(configurer -> configurer
                         .authenticationEntryPoint(securityProblemSupport)
                         .accessDeniedHandler(securityProblemSupport))
-                .cors(configurer -> configurer.configurationSource(corsConfigurationSource()))
                 // 配置URL级别的访问权限
                 .authorizeRequests(registry -> registry
                         .mvcMatchers("/authorize/**").permitAll() // 公开访问(会走过滤器链,会给未登录的用户适配一个匿名认证对象)
-                        //.mvcMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                        .mvcMatchers("/admin/**").hasRole("ADMIN")
+                        .mvcMatchers("/admin/**").hasAnyAuthority(ROLE_ADMIN, SCOPE_PREFIX + "user.admin", SCOPE_PREFIX + "client.admin")
                         //.mvcMatchers("/api/greeting/{username}").access("hasRole('ADMIN') or @userServiceImpl.isUserself(authentication, #username)")
                         .mvcMatchers("/api/user/{email}").hasRole("MANAGER")
                         .mvcMatchers("/api/greeting/{username}").access("hasRole('ADMIN') or authentication.name.equals(#username)")
@@ -156,21 +125,41 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
                         .anyRequest().authenticated())
                 // 替换过滤器
                 //.addFilterAt(payloadAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // 加入过滤器
+                //.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2ResourceServer(configurer -> configurer.jwt().jwtAuthenticationConverter(customJwtAuthenticationConverter())) // 配置自定义转换器(通过JWT构建认证对象)
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults())
+                .logout(AbstractHttpConfigurer::disable);
     }
-    
+
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) {
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                //.authenticationProvider(ldapAuthenticationProvider())
-                .authenticationProvider(daoAuthenticationProvider());
+                .userDetailsService(userDetailsService)
+                .userDetailsPasswordManager(userDetailsPasswordService)
+                .passwordEncoder(passwordEncoder());
     }
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().mvcMatchers("/error/**"); // 公开访问(会绕开过滤器链)
+        web
+                .ignoring() // 公开访问(会绕开过滤器链)
+                .mvcMatchers("/resources/**", "/static/**", "/public/**", "/error/**")
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+    }
+
+    private Converter<Jwt, AbstractAuthenticationToken> customJwtAuthenticationConverter() {
+        return jwt -> {
+            List<String> authorities = jwt.getClaimAsStringList("authorities");
+            List<String> scopes = jwt.getClaimAsStringList("scope");
+            // 组装用户权限和客户端权限
+            List<SimpleGrantedAuthority> combinedAuthorities = Stream.concat(
+                    authorities.stream(),
+                    scopes.stream().map(scope -> SCOPE_PREFIX + scope))
+                    .map(SimpleGrantedAuthority::new).collect(toList());
+            String username = jwt.getClaimAsString("user_name");
+            return new UsernamePasswordAuthenticationToken(username, null, combinedAuthorities);
+        };
     }
 }

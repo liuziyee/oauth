@@ -17,16 +17,16 @@ public class PayloadAuthenticationFilter extends UsernamePasswordAuthenticationF
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        UsernamePasswordAuthenticationToken authToken = null;
+        UsernamePasswordAuthenticationToken authentication = null;
         try {
             UserDTO payload = JSON.parseObject(request.getInputStream(), UserDTO.class);
             
-            authToken = new UsernamePasswordAuthenticationToken(payload.getUsername(), payload.getPassword());
-            setDetails(request, authToken);
+            authentication = new UsernamePasswordAuthenticationToken(payload.getUsername(), payload.getPassword());
+            setDetails(request, authentication);
         } catch (IOException e) {
-            log.info(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         } finally {
-            return this.getAuthenticationManager().authenticate(authToken);
+            return this.getAuthenticationManager().authenticate(authentication);
         }
     }
 }

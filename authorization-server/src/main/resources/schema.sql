@@ -85,7 +85,7 @@ INSERT INTO users_roles(user_id, role_id) values (1, 1), (1, 2), (1, 3), (2, 1);
 INSERT INTO roles_permissions(role_id, permission_id) values (1, 1), (2, 1), (2, 2), (2, 3), (2, 4);
 INSERT INTO oauth_client_details (client_id, client_name, client_secret, scope, authorized_grant_types, web_server_redirect_uri, access_token_validity, refresh_token_validity, additional_information, autoapprove)
 VALUES ('web-client', '第三方客户端', '{noop}secret', 'todo.read,todo.write', 'authorization_code,password,refresh_token,client_credentials', 'http://localhost:20000/login/oauth2/code/web-client-auth-code', '900', '31536000', '{}', null),
-       ('admin-client', '后台管理前端', '{noop}secret', 'user.admin,client.admin', 'authorization_code,password,refresh_token,client_credentials', 'http://localhost:4001', '60', '31536000', '{}', true),
+       ('admin-client', '后台管理前端(无服务器)', '{noop}secret', 'user.admin,client.admin', 'authorization_code,password,refresh_token,client_credentials', 'http://localhost:4001', '60', '31536000', '{}', true),
        ('ios-client', 'IOS客户端', '{noop}secret', 'todo.read,todo.write', 'authorization_code,password,refresh_token,client_credentials', 'com.example.app://action', '900', '31536000', '{}', null),
        ('android-client', 'Android客户端', '{noop}secret', 'todo.read,todo.write', 'authorization_code,password,refresh_token,client_credentials', 'com.example.app://action', '900', '31536000', '{}', null),
        ('todo-service', 'todo服务', '{noop}secret', 'todo.read,todo.write', 'authorization_code,refresh_token,client_credentials', 'http://localhost:30000/authorized', '900', '31536000', '{}', true );

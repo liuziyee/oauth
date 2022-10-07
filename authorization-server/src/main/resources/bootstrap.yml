@@ -27,6 +27,12 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:10000/.well-known/jwks.json # 获取公钥端点
+  messages:
+    always-use-message-format: false
+    basename: message
+    encoding: UTF-8
+    fallback-to-system-locale: true
+    use-code-as-default-message: false
 
 mybatis-plus:
   configuration:
