@@ -90,4 +90,4 @@ VALUES ('web-client', '第三方客户端', '{noop}secret', 'todo.read,todo.writ
        ('android-client', 'Android客户端', '{noop}secret', 'todo.read,todo.write', 'authorization_code,password,refresh_token,client_credentials', 'com.example.app://action', '900', '31536000', '{}', null),
        ('todo-service', 'todo服务', '{noop}secret', 'todo.read,todo.write', 'authorization_code,refresh_token,client_credentials', 'http://localhost:30000/authorized', '900', '31536000', '{}', true );
 
-生成公钥私钥对:keytool -genkeypair -alias oauth-jwks -keyalg算法 RSA -keystore存储文件 oauth-jwks.keystore -keypass通行短语 dorohedoro -storepass dorohedoro 
+生成公钥私钥对:keytool -genkeypair -alias oauth-jwks -keyalg算法 RSA -keystore存储文件 oauth-jwks.keystore -keypass通行短语 dorohedoro -storepass dorohedoro
