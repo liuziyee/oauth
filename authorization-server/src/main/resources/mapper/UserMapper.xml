@@ -54,7 +54,7 @@
                 u.username = #{user.username}
             </if>
             <if test="user.email != null and user.email != ''">
-                u.email = #{user.email}
+                and u.email = #{user.email}
             </if>
         </trim>
     </select>
