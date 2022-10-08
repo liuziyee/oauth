@@ -114,7 +114,7 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling(configurer -> configurer
                         .authenticationEntryPoint(securityProblemSupport)
                         .accessDeniedHandler(securityProblemSupport))
-                // 配置URL级别的访问权限
+                // 配置URL访问权限
                 .authorizeRequests(registry -> registry
                         .mvcMatchers("/authorize/**").permitAll() // 公开访问(会走过滤器链,会给未登录的用户适配一个匿名认证对象)
                         .mvcMatchers("/admin/**").hasAnyAuthority(ROLE_ADMIN, SCOPE_PREFIX + "user.admin", SCOPE_PREFIX + "client.admin")
