@@ -102,6 +102,7 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public RoleHierarchyImpl roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy(Constants.ROLE_HIERARCHY_INIT_EXPR);
         return roleHierarchy;
     }
 

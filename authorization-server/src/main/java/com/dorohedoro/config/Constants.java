@@ -18,7 +18,7 @@ public class Constants {
     public static final String AUTHORITY_USER_UPDATE = "USER_UPDATE";
     public static final String AUTHORITY_USER_CREATE = "USER_CREATE";
     public static final String AUTHORITY_USER_READ = "USER_READ";
-
+    public static final String ROLE_HIERARCHY_INIT_EXPR = "ROLE_ADMIN > ROLE_STAFF\nROLE_STAFF > ROLE_USER\n"; // 用来初始化角色包含关系
     
     public static final Integer PAGE_OFFSET = 1;
     public static final Integer PAGE_SIZE = 10; // 每页记录数

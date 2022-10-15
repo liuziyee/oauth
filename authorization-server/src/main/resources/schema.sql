@@ -92,3 +92,5 @@ VALUES ('web-client', '第三方客户端', '{noop}secret', 'todo.read,todo.writ
 
 # root的密码为dorohedoro1994
 # 生成公钥私钥对:keytool -genkeypair -alias oauth-jwks -keyalg算法 RSA -keystore存储文件 oauth-jwks.keystore -keypass通行短语 dorohedoro -storepass dorohedoro
+# 前端代码oauth-ui在百度云的代码包文件夹里
+# 抓包查看oauth2授权码流程:无痕窗口访问http://localhost:4001(也是重定向地址),开发者工具勾选Preserve log,选中ALL

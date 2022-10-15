@@ -1,5 +1,6 @@
 package com.dorohedoro.service.impl;
 
+import com.dorohedoro.config.Constants;
 import com.dorohedoro.domain.Role;
 import com.dorohedoro.mapper.RoleMapper;
 import com.dorohedoro.service.IRoleService;
@@ -31,6 +32,6 @@ public class RoleServiceImpl implements IRoleService {
                     return role.getPermissions().stream()
                             .map(permission -> role.getRoleName() + " > " + permission.getAuthority());
                 })
-                .collect(joining(" ", "ROLE_ADMIN > ROLE_STAFF ROLE_STAFF > ROLE_USER ", ""));
+                .collect(joining("\n", Constants.ROLE_HIERARCHY_INIT_EXPR, ""));
     }
 }

@@ -3,6 +3,7 @@ package com.dorohedoro.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,7 @@ import javax.sql.DataSource;
 import java.security.KeyPair;
 import java.util.List;
 
+@Order(1)
 @RequiredArgsConstructor
 @EnableAuthorizationServer
 @Configuration
