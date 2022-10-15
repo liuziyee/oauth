@@ -68,15 +68,15 @@ CREATE TABLE oauth_client_details (
     additional_information VARCHAR(4096)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT='oauth客户端信息表';
 
-
 INSERT INTO permissions(id, permission_name, display_name)
 VALUES (1, 'USER_READ', '查询用户信息'),
        (2, 'USER_CREATE', '新建用户'),
        (3, 'USER_UPDATE', '编辑用户信息'),
        (4, 'USER_ADMIN', '用户管理');
+
 INSERT INTO users(id, username, mobile, password_hash, enabled, account_non_expired, account_non_locked, credentials_non_expired, email)
 VALUES (1, 'root', '00000000000', '{bcrypt}$2a$10$V7Pd6zlCA8EDefp3nTOvwO3IT7UgZ9UGjJ0Lb/ttUXb4SS948qroe', 1, 1, 1, 1, 'dorohedoro@163.com'),
-       (2, 'jiaozi', '11111111111', '{SHA-1}7ce0359f12857f2a90c7de465f40a95f01cb5da9', 1, 1, 1, 1, 'jiaozi@163.com');
+       (2, 'jiaozi', '11111111111', '{bcrypt}$2a$10$V7Pd6zlCA8EDefp3nTOvwO3IT7UgZ9UGjJ0Lb/ttUXb4SS948qroe', 1, 1, 1, 1, 'jiaozi@163.com');
 INSERT INTO roles(id, role_name, display_name, built_in)
 VALUES (1, 'ROLE_USER', '客户端用户', true),
        (2, 'ROLE_ADMIN', '超级管理员', true),
@@ -90,4 +90,5 @@ VALUES ('web-client', '第三方客户端', '{noop}secret', 'todo.read,todo.writ
        ('android-client', 'Android客户端', '{noop}secret', 'todo.read,todo.write', 'authorization_code,password,refresh_token,client_credentials', 'com.example.app://action', '900', '31536000', '{}', null),
        ('todo-service', 'todo服务', '{noop}secret', 'todo.read,todo.write', 'authorization_code,refresh_token,client_credentials', 'http://localhost:30000/authorized', '900', '31536000', '{}', true );
 
-生成公钥私钥对:keytool -genkeypair -alias oauth-jwks -keyalg算法 RSA -keystore存储文件 oauth-jwks.keystore -keypass通行短语 dorohedoro -storepass dorohedoro
+# root的密码为dorohedoro1994
+# 生成公钥私钥对:keytool -genkeypair -alias oauth-jwks -keyalg算法 RSA -keystore存储文件 oauth-jwks.keystore -keypass通行短语 dorohedoro -storepass dorohedoro

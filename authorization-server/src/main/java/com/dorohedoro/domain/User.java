@@ -66,7 +66,8 @@ public class User extends PageBean implements UserDetails, Serializable {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
                 .flatMap(role -> Stream.concat(
-                        Stream.of(new SimpleGrantedAuthority(role.getRoleName())), role.getPermissions().stream())
+                        Stream.of(new SimpleGrantedAuthority(role.getRoleName())), 
+                        role.getPermissions().stream())
                 ) // 把角色和权限平铺开,放入一个流里
                 .collect(toSet()); // 去掉重复的权限
     }

@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,6 +43,7 @@ import static java.util.stream.Collectors.toList;
 
 @Order(10)
 @EnableWebSecurity(debug = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true) // 启用方法访问权限注解
 @Import(SecurityProblemSupport.class)
 @RequiredArgsConstructor
 // 授权服务器做为资源服务器的安全配置
@@ -78,13 +80,13 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /*@Bean
     public PayloadAuthenticationFilter payloadAuthenticationFilter() throws Exception {
-        PayloadAuthenticationFilter payloadAuthFilter = new PayloadAuthenticationFilter();
-        payloadAuthFilter.setAuthenticationSuccessHandler((req, res, auth) -> {
+        PayloadAuthenticationFilter payloadAuthenticationFilter = new PayloadAuthenticationFilter();
+        payloadAuthenticationFilter.setAuthenticationSuccessHandler((req, res, auth) -> {
             res.setStatus(HttpStatus.OK.value());
             res.setContentType("application/json;charset=UTF-8");
             res.getWriter().write(JSON.toJSONString(auth));
         });
-        payloadAuthFilter.setAuthenticationFailureHandler((req, res, exception) -> {
+        payloadAuthenticationFilter.setAuthenticationFailureHandler((req, res, exception) -> {
             res.setStatus(HttpStatus.UNAUTHORIZED.value());
             JSONObject data = new JSONObject();
             data.put("msg", "Unauthorized");
@@ -92,17 +94,14 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
             res.setContentType("application/json;charset=UTF-8");
             res.getWriter().write(data.toJSONString());
         });
-        payloadAuthFilter.setAuthenticationManager(authenticationManager());
-        payloadAuthFilter.setFilterProcessesUrl("/authorize/login");
-        return payloadAuthFilter;
+        payloadAuthenticationFilter.setAuthenticationManager(authenticationManager());
+        payloadAuthenticationFilter.setFilterProcessesUrl("/authorize/login");
+        return payloadAuthenticationFilter;
     }*/
-    
+
     @Bean
     public RoleHierarchyImpl roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy(
-                "ROLE_ADMIN > ROLE_STAFF\n" +
-                        "ROLE_STAFF > ROLE_USER"); // 配置角色包含关系
         return roleHierarchy;
     }
 
@@ -116,7 +115,7 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
                         .accessDeniedHandler(securityProblemSupport))
                 // 配置URL访问权限
                 .authorizeRequests(registry -> registry
-                        .mvcMatchers("/authorize/**").permitAll() // 公开访问(会走过滤器链,会给未登录的用户适配一个匿名认证对象)
+                        .mvcMatchers("/authorize/**").permitAll() // 公开访问(会走过滤器链,会给未登录的用户分配一个匿名认证对象)
                         .mvcMatchers("/admin/**").hasAnyAuthority(ROLE_ADMIN, SCOPE_PREFIX + "user.admin", SCOPE_PREFIX + "client.admin")
                         //.mvcMatchers("/api/greeting/{username}").access("hasRole('ADMIN') or @userServiceImpl.isUserself(authentication, #username)")
                         .mvcMatchers("/api/user/{email}").hasRole("MANAGER")
@@ -157,7 +156,8 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
             List<SimpleGrantedAuthority> combinedAuthorities = Stream.concat(
                     authorities.stream(),
                     scopes.stream().map(scope -> SCOPE_PREFIX + scope))
-                    .map(SimpleGrantedAuthority::new).collect(toList());
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(toList());
             String username = jwt.getClaimAsString("user_name");
             return new UsernamePasswordAuthenticationToken(username, null, combinedAuthorities);
         };

@@ -19,6 +19,7 @@ public class RoleServiceImpl implements IRoleService {
     private final RoleMapper roleMapper;
 
     @Override
+    // 生成角色包含关系(角色与角色之间,角色与权限之间)表达式
     public String getRoleHierarchyExpr() {
         List<Role> roles = roleMapper.selectByRolename(null);
         if (CollectionUtils.isEmpty(roles)) return "";
@@ -30,6 +31,6 @@ public class RoleServiceImpl implements IRoleService {
                     return role.getPermissions().stream()
                             .map(permission -> role.getRoleName() + " > " + permission.getAuthority());
                 })
-                .collect(joining(" ", "ROLE_ADMIN" + " > " + "ROLE_STAFF ", ""));
+                .collect(joining(" ", "ROLE_ADMIN > ROLE_STAFF ROLE_STAFF > ROLE_USER ", ""));
     }
 }
