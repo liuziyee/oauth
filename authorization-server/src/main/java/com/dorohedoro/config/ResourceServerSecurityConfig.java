@@ -153,7 +153,7 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
         return jwt -> {
             List<String> authorities = jwt.getClaimAsStringList("authorities");
             List<String> scopes = jwt.getClaimAsStringList("scope");
-            // 组装用户权限和客户端权限
+            // 组装授权用户权限和客户端权限
             List<SimpleGrantedAuthority> combinedAuthorities = Stream.concat(
                     authorities.stream(),
                     scopes.stream().map(scope -> SCOPE_PREFIX + scope))
