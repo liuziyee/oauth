@@ -116,7 +116,7 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
                         .accessDeniedHandler(securityProblemSupport))
                 // 配置URL访问权限
                 .authorizeRequests(registry -> registry
-                        .mvcMatchers("/authorize/**").permitAll() // 公开访问(会走过滤器链,会给未登录的用户分配一个匿名认证对象)
+                        .mvcMatchers("/authorize/**").permitAll() // 公开访问
                         .mvcMatchers("/admin/**").hasAnyAuthority(ROLE_ADMIN, SCOPE_PREFIX + "user.admin", SCOPE_PREFIX + "client.admin")
                         //.mvcMatchers("/api/greeting/{username}").access("hasRole('ADMIN') or @userServiceImpl.isUserself(authentication, #username)")
                         .mvcMatchers("/api/user/{email}").hasRole("MANAGER")
@@ -144,7 +144,7 @@ public class ResourceServerSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         web
-                .ignoring() // 公开访问(会绕开过滤器链)
+                .ignoring() // 公开访问
                 .mvcMatchers("/resources/**", "/static/**", "/public/**", "/error/**")
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
