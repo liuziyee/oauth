@@ -8,7 +8,7 @@ import com.dorohedoro.annotation.RoleAdminOrAuthorityUserUpdate;
 import com.dorohedoro.domain.Role;
 import com.dorohedoro.domain.User;
 import com.dorohedoro.domain.UserRole;
-import com.dorohedoro.exception.InvalidParamProblem;
+import com.dorohedoro.problem.InvalidParamProblem;
 import com.dorohedoro.mapper.RoleMapper;
 import com.dorohedoro.mapper.UserMapper;
 import com.dorohedoro.mapper.UserRoleMapper;

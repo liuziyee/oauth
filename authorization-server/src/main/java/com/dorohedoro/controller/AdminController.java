@@ -7,7 +7,7 @@ import com.dorohedoro.domain.User;
 import com.dorohedoro.domain.dto.PageBean;
 import com.dorohedoro.domain.dto.RoleDTO;
 import com.dorohedoro.domain.dto.UserDTO;
-import com.dorohedoro.exception.InvalidParamProblem;
+import com.dorohedoro.problem.InvalidParamProblem;
 import com.dorohedoro.service.IPermissionAdminService;
 import com.dorohedoro.service.IRoleAdminService;
 import com.dorohedoro.service.IUserAdminService;

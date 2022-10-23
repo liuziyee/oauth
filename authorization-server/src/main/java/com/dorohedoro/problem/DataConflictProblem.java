@@ -1,4 +1,4 @@
-package com.dorohedoro.exception;
+package com.dorohedoro.problem;
 
 import com.dorohedoro.config.Constants;
 import org.zalando.problem.AbstractThrowableProblem;

@@ -1,4 +1,4 @@
-package com.dorohedoro.exception;
+package com.dorohedoro.problem;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.zalando.problem.spring.web.advice.security.SecurityAdviceTrait;

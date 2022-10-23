@@ -6,7 +6,7 @@ import com.dorohedoro.domain.Role;
 import com.dorohedoro.domain.User;
 import com.dorohedoro.domain.UserRole;
 import com.dorohedoro.domain.dto.Token;
-import com.dorohedoro.exception.DuplicateProblem;
+import com.dorohedoro.problem.DuplicateProblem;
 import com.dorohedoro.mapper.RoleMapper;
 import com.dorohedoro.mapper.UserMapper;
 import com.dorohedoro.mapper.UserRoleMapper;
