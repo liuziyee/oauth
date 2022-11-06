@@ -10,7 +10,7 @@ import com.dorohedoro.domain.Role;
 import com.dorohedoro.domain.RolePermission;
 import com.dorohedoro.domain.UserRole;
 import com.dorohedoro.problem.DataConflictProblem;
-import com.dorohedoro.problem.DuplicateProblem;
+import com.dorohedoro.problem.DataDuplicateProblem;
 import com.dorohedoro.problem.InvalidParamProblem;
 import com.dorohedoro.mapper.PermissionMapper;
 import com.dorohedoro.mapper.RoleMapper;
@@ -47,7 +47,7 @@ public class RoleAdminServiceImpl implements IRoleAdminService {
     @Override
     public Role createRole(Role role) {
         String roleName = role.getRoleName();
-        if (isRolenameExist(roleName)) throw new DuplicateProblem("角色名" + roleName + "已存在");
+        if (isRolenameExist(roleName)) throw new DataDuplicateProblem("角色名" + roleName + "已存在");
 
         role.setRoleName(roleName.toUpperCase());
         roleMapper.insert(role);
@@ -60,7 +60,7 @@ public class RoleAdminServiceImpl implements IRoleAdminService {
     public Role updateRole(Long id, Role role) {
         String roleName = role.getRoleName();
         if (isRolenameExist(roleName)) {
-            throw new DuplicateProblem("角色名" + roleName + "已存在");
+            throw new DataDuplicateProblem("角色名" + roleName + "已存在");
         }
 
         role.setRoleName(roleName.toUpperCase());
