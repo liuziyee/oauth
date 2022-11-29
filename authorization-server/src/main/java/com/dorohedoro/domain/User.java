@@ -43,8 +43,6 @@ public class User extends PageBean implements UserDetails, Serializable {
     private boolean credentialsNonExpired;
     @JSONField(serialize = false)
     private Set<Role> roles = new HashSet<>(); // 这里为了规避空指针做了初始化
-    
-    // TODO 两个字段 usingMfa mfaKey
 
     @Override
     public boolean isAccountNonExpired() {

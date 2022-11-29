@@ -23,6 +23,4 @@ public interface IUserAdminService {
     User toggleEnabled(String username);
 
     Set<Role> getAvailableRoles(String username);
-    
-    // TODO 参考源码 toggleAccountNonExpired() toggleAccountNonLocked() toggleCredentialsNonExpired() generatePassword()
 }

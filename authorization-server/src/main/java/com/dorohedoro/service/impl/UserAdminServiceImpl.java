@@ -50,7 +50,7 @@ public class UserAdminServiceImpl implements IUserAdminService {
     @RoleAdminOrAuthorityUserCreate
     public User create(User user) {
         Role staffRole = roleMapper.selectByRolename(ROLE_STAFF).get(0);
-        user.setPassword(passwordEncoder.encode("12345")); // TODO 密码工具类
+        user.setPassword(passwordEncoder.encode("12345"));
         userMapper.insert(user);
 
         UserRole userToRole = new UserRole();

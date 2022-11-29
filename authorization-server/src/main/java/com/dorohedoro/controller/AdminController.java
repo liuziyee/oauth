@@ -120,6 +120,4 @@ public class AdminController {
     public Set<Permission> getAllPermissions() {
         return permissionAdminService.getAll();
     }
-    
-    // TODO 参考源码 validateEmail() validateMobile() validateRoleName() validateRoleNameNotSelf()
 }
