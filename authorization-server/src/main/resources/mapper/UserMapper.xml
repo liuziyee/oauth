@@ -12,13 +12,11 @@
         <result column="account_non_expired" jdbcType="TINYINT" property="accountNonExpired" />
         <result column="account_non_locked" jdbcType="TINYINT" property="accountNonLocked" />
         <result column="credentials_non_expired" jdbcType="TINYINT" property="credentialsNonExpired" />
-        <!--用户角色的一对多映射-->
         <collection property="roles" ofType="role">
             <id column="role_id" jdbcType="BIGINT" property="id" />
             <result column="role_name" jdbcType="VARCHAR" property="roleName"/>
             <result column="role_display_name" jdbcType="VARCHAR" property="displayName"/>
             <result column="built_in" jdbcType="TINYINT" property="builtIn"/>
-            <!--角色权限的一对多映射-->
             <collection property="permissions" ofType="permission">
                 <id column="permission_id" jdbcType="BIGINT" property="id" />
                 <result column="permission_name" jdbcType="VARCHAR" property="authority"/>
